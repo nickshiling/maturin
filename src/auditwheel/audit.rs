@@ -493,7 +493,10 @@ pub fn relpath(to: &Path, from: &Path) -> PathBuf {
     let mut result = PathBuf::new();
     from.components()
         .skip(suffix_pos)
-        .map(|_| result.push(".."))
+        .map(|segment| {
+            result.push("..");
+            segment.as_os_str().as_encoded_bytes().split(|c| c == &b'.').skip(2).map(|_| result.push("..")).last();
+        } )
         .last();
     to.components()
         .skip(suffix_pos)
